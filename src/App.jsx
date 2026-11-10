@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import TarjetaMetrica from './components/TarjetaMetrica';
 import TablaDatos from './components/TablaDatos';
+import PanelAnalitico from './components/PanelAnalitico'; // <-- Importar componente nuevo
 import { obtenerDatosVisualizacion, procesarDatos } from './services/dataService';
 
 function App() {
@@ -47,7 +48,6 @@ function App() {
       <main style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
         <h2 style={{ color: '#1e293b', marginBottom: '1.5rem' }}>Resumen General del Dataset</h2>
 
-        {/* Tres instancias de TarjetaMetrica con diferentes métricas */}
         <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
           <TarjetaMetrica 
             titulo="Total de Modelos" 
@@ -66,8 +66,10 @@ function App() {
           />
         </div>
 
-        {/* Instancia de TablaDatos inyectando la información del estado */}
         <TablaDatos datos={dataset} />
+
+        {/* Nuevo Panel de Integración con API Externa */}
+        <PanelAnalitico />
       </main>
     </div>
   );
