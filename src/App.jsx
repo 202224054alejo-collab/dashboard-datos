@@ -1,4 +1,4 @@
-// src/App.jsx
+// Actualización en src/App.jsx
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import DashboardLayout from './components/DashboardLayout';
@@ -6,6 +6,9 @@ import PanelFiltros from './components/PanelFiltros';
 import TarjetaMetrica from './components/TarjetaMetrica';
 import TablaDatos from './components/TablaDatos';
 import PanelAnalitico from './components/PanelAnalitico';
+// Importar gráficos D3.js
+import GraficoTendencia from './components/charts/GraficoTendencia';
+import GraficoComparativo from './components/charts/GraficoComparativo';
 import { obtenerDatosVisualizacion, procesarDatos } from './services/dataService';
 
 function App() {
@@ -18,14 +21,11 @@ function App() {
     precisionMaxima: 0
   });
   const [loading, setLoading] = useState(true);
-
-  // Estado global para los filtros interactivos
   const [filtros, setFiltros] = useState({
     categoria: 'todos',
     fecha: ''
   });
 
-  // 1. Carga inicial de datos al montar la aplicación
   useEffect(() => {
     const cargarDatosIniciales = async () => {
       try {
@@ -44,25 +44,17 @@ function App() {
     cargarDatosIniciales();
   }, []);
 
-  // 2. useEffect que "escucha" los cambios en el estado filtros para recalcular las vistas en tiempo real
   useEffect(() => {
     if (datasetCompleto.length === 0) return;
 
     let datosTemp = [...datasetCompleto];
 
-    // Aplicar filtro por categoría / estado
     if (filtros.categoria === 'activo') {
       datosTemp = datosTemp.filter(item => item.estado === 'Activo' || item.estado === 'Optimizado');
     } else if (filtros.categoria === 'revision') {
       datosTemp = datosTemp.filter(item => item.estado === 'En revisión');
     }
 
-    // Simulación de filtrado por fecha si el usuario selecciona una
-    if (filtros.fecha) {
-      console.log(`Filtrando datos para la fecha: ${filtros.fecha}`);
-    }
-
-    // Actualizar dataset filtrado y recalcular métricas simultáneamente
     setDatasetFiltrado(datosTemp);
     const nuevasMetricas = procesarDatos(datosTemp);
     setMetricas(nuevasMetricas);
@@ -72,7 +64,7 @@ function App() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'sans-serif' }}>
-        <h2>Cargando Dashboard Interactivo...</h2>
+        <h2>Cargando Dashboard de Visualización...</h2>
       </div>
     );
   }
@@ -82,22 +74,20 @@ function App() {
       <Navbar />
       
       <DashboardLayout>
-        <h2 style={{ color: '#1e293b', margin: 0 }}>Dashboard de Ciencia de Datos - Panel Analítico</h2>
+        <h2 style={{ color: '#1e293b', margin: 0 }}>Dashboard Avanzado de Ciencia de Datos</h2>
 
-        {/* Panel de Filtros Interactivos (Estado Compartido) */}
         <PanelFiltros filtros={filtros} setFiltros={setFiltros} />
 
-        {/* Tarjetas de Métricas que se actualizan en tiempo real */}
         <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
           <TarjetaMetrica 
             titulo="Modelos Filtrados" 
             valor={metricas.totalModelos} 
-            descripcion="Elementos activos en la vista actual" 
+            descripcion="Elementos activos en la vista" 
           />
           <TarjetaMetrica 
             titulo="Precisión Promedio" 
             valor={`${(metricas.promedioPrecision * 100).toFixed(0)}%`} 
-            descripcion="Rendimiento medio filtrado" 
+            descripcion="Rendimiento medio global" 
           />
           <TarjetaMetrica 
             titulo="Destacado Actual" 
@@ -106,10 +96,14 @@ function App() {
           />
         </div>
 
-        {/* Tabla de Datos Dinámica conectada al estado filtrado */}
+        {/* Contenedor Flexbox para mostrar ambos gráficos lado a lado de forma responsiva */}
+        <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+          <GraficoTendencia datos={datasetFiltrado} />
+          <GraficoComparativo datos={datasetFiltrado} />
+        </div>
+
         <TablaDatos datos={datasetFiltrado} />
 
-        {/* Panel de API Externa desarrollado en la Práctica 3 */}
         <PanelAnalitico />
       </DashboardLayout>
     </div>

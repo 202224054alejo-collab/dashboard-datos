@@ -81,3 +81,20 @@ export const obtenerSerieDeTiempo = async (lat = 19.43, lon = -99.13) => {
     throw new Error('No se pudo conectar con la API de ciencia de datos. Verifique su conexión.');
   }
 };
+
+// Añadir en src/services/dataService.js
+
+/**
+ * Transforma un arreglo de objetos en estructuras aptas para gráficas (labels y values)
+ */
+export const formatearParaGrafico = (datos) => {
+  if (!datos || datos.length === 0) {
+    return { labels: [], values: [] };
+  }
+
+  const labels = datos.map((item) => item.modelo || item.hora || `Item ${item.id}`);
+  // Extraemos un valor numérico representativo (ej. precision * 100 o temperatura)
+  const values = datos.map((item) => item.precision ? Number((item.precision * 100).toFixed(1)) : Number(item.temperatura || 0));
+
+  return { labels, values };
+};
